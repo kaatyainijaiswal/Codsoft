@@ -1,0 +1,57 @@
+package javainternship;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class CurrencyConvertor {
+    public static void main(String[] args) {
+        // Define exchange rates (manually or using a fixed set)
+        Map<String, Double> exchangeRates = new HashMap<>();
+        exchangeRates.put("USD", 1.0);
+        exchangeRates.put("EUR", 0.85);
+        exchangeRates.put("GBP", 0.72);
+        // Add more currencies and exchange rates as needed
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Available currencies:");
+        for (String currency : exchangeRates.keySet()) {
+            System.out.print(currency + " ");
+        }
+
+        System.out.print("\nEnter base currency: ");
+        String baseCurrency = scanner.nextLine().toUpperCase();
+
+        if (!exchangeRates.containsKey(baseCurrency)) {
+            System.out.println("Invalid base currency.");
+            return;
+        }
+
+        System.out.print("Enter target currency: ");
+        String targetCurrency = scanner.nextLine().toUpperCase();
+
+        if (!exchangeRates.containsKey(targetCurrency)) {
+            System.out.println("Invalid target currency.");
+            return;
+        }
+
+        System.out.print("Enter amount to convert: ");
+        double amount = scanner.nextDouble();
+
+        if (amount < 0) {
+            System.out.println("Invalid amount.");
+            return;
+        }
+
+        double convertedAmount = convertCurrency(amount, baseCurrency, targetCurrency, exchangeRates);
+        System.out.printf("%.2f %s is %.2f %s%n", amount, baseCurrency, convertedAmount, targetCurrency);
+    }
+
+    private static double convertCurrency(double amount, String baseCurrency, String targetCurrency, Map<String, Double> exchangeRates) {
+        double baseRate = exchangeRates.get(baseCurrency);
+        double targetRate = exchangeRates.get(targetCurrency);
+
+        return (amount / baseRate) * targetRate;
+    }
+}
