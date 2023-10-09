@@ -1,0 +1,141 @@
+package javainternship;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+class Student {
+    private String name;
+    private int rollNumber;
+    private String grade;
+
+    public Student(String name, int rollNumber, String grade) {
+        this.name = name;
+        this.rollNumber = rollNumber;
+        this.grade = grade;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRollNumber() {
+        return rollNumber;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+}
+
+class StudentManagementSystem {
+    private List<Student> students = new ArrayList<>();
+
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public void removeStudent(int rollNumber) {
+        students.removeIf(student -> student.getRollNumber() == rollNumber);
+    }
+
+    public Student findStudent(int rollNumber) {
+        for (Student student : students) {
+            if (student.getRollNumber() == rollNumber) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public List<Student> getAllStudents() {
+        return students;
+    }
+}
+
+public class StudentManagementSystemGUI extends JFrame {
+    private StudentManagementSystem sms = new StudentManagementSystem();
+    private DefaultListModel<Student> studentListModel = new DefaultListModel<>();
+    private JList<Student> studentList = new JList<>(studentListModel);
+    private JTextField nameTextField = new JTextField(15);
+    private JTextField rollNumberTextField = new JTextField(5);
+    private JTextField gradeTextField = new JTextField(5);
+
+    public StudentManagementSystemGUI() {
+        setTitle("Student Management System");
+        setSize(500, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        formPanel.add(new JLabel("Name:"));
+        formPanel.add(nameTextField);
+        formPanel.add(new JLabel("Roll Number:"));
+        formPanel.add(rollNumberTextField);
+        formPanel.add(new JLabel("Grade:"));
+        formPanel.add(gradeTextField);
+        JButton addButton = new JButton("Add Student");
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = nameTextField.getText();
+                String rollNumberStr = rollNumberTextField.getText();
+                String grade = gradeTextField.getText();
+
+                if (name.isEmpty() || rollNumberStr.isEmpty() || grade.isEmpty()) {
+                    JOptionPane.showMessageDialog(StudentManagementSystemGUI.this, "All fields are required.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                try {
+                    int rollNumber = Integer.parseInt(rollNumberStr);
+                    Student student = new Student(name, rollNumber, grade);
+                    sms.addStudent(student);
+                    studentListModel.addElement(student);
+                    clearFields();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(StudentManagementSystemGUI.this, "Invalid Roll Number. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        formPanel.add(addButton);
+        mainPanel.add(formPanel, BorderLayout.WEST);
+
+        studentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane studentScrollPane = new JScrollPane(studentList);
+        mainPanel.add(studentScrollPane, BorderLayout.CENTER);
+
+        JButton removeButton = new JButton("Remove Student");
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Student selectedStudent = studentList.getSelectedValue();
+                if (selectedStudent != null) {
+                    sms.removeStudent(selectedStudent.getRollNumber());
+                    studentListModel.removeElement(selectedStudent);
+                }
+            }
+        });
+        mainPanel.add(removeButton, BorderLayout.SOUTH);
+
+        getContentPane().add(mainPanel);
+    }
+
+    private void clearFields() {
+        nameTextField.setText("");
+        rollNumberTextField.setText("");
+        gradeTextField.setText("");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new StudentManagementSystemGUI().setVisible(true);
+            }
+        });
+    }
+}
